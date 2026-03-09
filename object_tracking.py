@@ -1,22 +1,24 @@
-import torch
 import cv2
+import torch
 from PIL import Image
 from torchvision.transforms import transforms
 from yolov5.models.experimental import attempt_load
 
 # Load the pre-trained YOLOv5 model
-weights = 'yolov5s.pt'  # Path to the model weights
-model = attempt_load(weights, device=torch.device('cpu'))
+weights = "yolov5s.pt"  # Path to the model weights
+model = attempt_load(weights, device=torch.device("cpu"))
 
 # Set device (CPU or GPU)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device).eval()
 
 # Define the image transformation
-transform = transforms.Compose([
-    transforms.Resize((640, 640)),  # Resize image
-    transforms.ToTensor(),  # Convert to tensor
-])
+transform = transforms.Compose(
+    [
+        transforms.Resize((640, 640)),  # Resize image
+        transforms.ToTensor(),  # Convert to tensor
+    ]
+)
 
 # # Load and preprocess the input image
 # image_path = 'path/to/your/image.jpg'
@@ -33,7 +35,7 @@ transform = transforms.Compose([
 #     boxes = det[:, :4].detach().cpu().numpy()
 #     scores = det[:, 4].detach().cpu().numpy()
 #     labels = det[:, 5].detach().cpu().numpy().astype(int)
-    
+
 #     for box, score, label in zip(boxes, scores, labels):
 #         result = {
 #             'box': box.tolist(),
@@ -46,7 +48,7 @@ transform = transforms.Compose([
 tracker = cv2.TrackerCSRT_create()
 
 # Read the input video
-video_path = 'path/to/your/video.mp4'
+video_path = "path/to/your/video.mp4"
 video = cv2.VideoCapture(video_path)
 
 # Check if the video opened successfully
@@ -90,11 +92,7 @@ while True:
         labels = det[:, 5].detach().cpu().numpy().astype(int)
 
         for box, score, label in zip(boxes, scores, labels):
-            result = {
-                'box': box.tolist(),
-                'score': score,
-                'label': label
-            }
+            result = {"box": box.tolist(), "score": score, "label": label}
             results.append(result)
 
     # Update the tracker
@@ -105,25 +103,22 @@ while True:
 
     # Visualize the results
     for result in results:
-        box = result['box']
-        score = result['score']
-        label = result['label']
+        box = result["box"]
+        score = result["score"]
+        label = result["label"]
         x1, y1, x2, y2 = box
         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-        cv2.putText(frame, f'{score:.2f}', (int(x1), int(y1) - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
-        cv2.putText(frame, f'{label}', (int(x1), int(y1) - 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
-        
+        cv2.putText(frame, f"{score:.2f}", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
+        cv2.putText(frame, f"{label}", (int(x1), int(y1) - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
+
         # Increment object count
         object_count += 1
 
     # Display the object count
-    cv2.putText(frame, f'Object Count: {object_count}', (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+    cv2.putText(frame, f"Object Count: {object_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
     # Display the output frame
-    cv2.imshow('YOLOv5 Tracking', frame)
+    cv2.imshow("YOLOv5 Tracking", frame)
 
     # Exit if ESC key is pressed
     if cv2.waitKey(1) == 27:
